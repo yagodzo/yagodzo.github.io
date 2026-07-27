@@ -1,0 +1,37 @@
+{
+  "cascadeColors": false,
+  "colorBackground": false,
+  "palette": [
+    {
+      "id": "IU7xycXChRkvQrnhB70Es",
+      "name": "1",
+      "value": "#ffffff"
+    },
+    {
+      "id": "jRpdhsBKBR-1B0ukc0axE",
+      "name": "2",
+      "value": "#ff0000"
+    },
+    {
+      "id": "BheDNU2Q0uS4E_KEKK64e",
+      "name": "3",
+      "value": "#000dc7"
+    },
+    {
+      "id": "CVBAOuJnbb4WPRRywOq5j",
+      "name": "4",
+      "value": "#fbff00"
+    },
+    {
+      "id": "ddYwBio-8tdK62FSAGZJx",
+      "name": "5",
+      "value": "#1eff00"
+    }
+  ],
+  "fileColors": [
+    {
+      "path": "_posts",
+      "color": "ddYwBio-8tdK62FSAGZJx"
+    }
+  ]
+}
