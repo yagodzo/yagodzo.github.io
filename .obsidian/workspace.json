@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2026-07-28_Metasploit-Meterpreter.md",
+                "file": "_posts/2026-07-28-Metasploit_Meterpreter.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-07-28_Metasploit-Meterpreter"
+              "title": "2026-07-28-Metasploit_Meterpreter"
             }
           }
         ]
@@ -171,10 +171,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "_posts/2026-07-28_Metasploit-Meterpreter.md"
+                "file": "_posts/2026-07-28-Metasploit_Meterpreter.md"
               },
               "icon": "lucide-info",
-              "title": "Свойства файла для 2026-07-28_Metasploit-Meterpreter"
+              "title": "Свойства файла для 2026-07-28-Metasploit_Meterpreter"
             }
           }
         ],
@@ -198,11 +198,11 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "c772f25e76a9a2b4",
+  "active": "1aeabc13281ff3c4",
   "lastOpenFiles": [
     "assets/img/favicons/apple-touch-icon.png",
     "README.md",
-    "_posts/2026-07-28_Metasploit-Meterpreter.md",
+    "_posts/2026-07-28-Metasploit_Meterpreter.md",
     "assets/img/posts/28-07-2026-16-00.png",
     "post-template/templates_post.md",
     "assets/img/favicons/favicon-96x96.png",
