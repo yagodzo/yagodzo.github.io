@@ -8,3 +8,5 @@ tags:
 icon:
 ---
 123
+2026-07-28
+![](assets/img/posts/28-07-2026-16-00.png)
