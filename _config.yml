@@ -18,14 +18,13 @@ github:
   username: yagodzo
 
 twitter:
-  username: # оставьте пустым, если нет Twitter
+  username: 
 
 social:
-  name: yagodzo   # Или ваше полное имя, если хотите
-  #email:  # расскоментируйте и введите e-mail при желании
+  name: yagodzo   
+  #email:
   links:
     - https://github.com/yagodzo
-    # Добавьте другие соцсети при необходимости
 
 # Site Verification Settings
 webmaster_verifications:
@@ -61,11 +60,9 @@ theme_mode: dark
 
 cdn:
 
-# Аватар: если файл pp.png ещё не заменили на свой, временно оставьте пустым, 
-# чтобы не показывать чужую фотографию. Как подготовите – укажите путь.
-avatar: # assets/img/pp.png
+avatar: assets/img/qq.png
 
-social_preview_image:
+social_preview_image: 
 
 toc: true
 
