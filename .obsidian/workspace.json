@@ -11,14 +11,12 @@
             "id": "1aeabc13281ff3c4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "_posts/2026-07-28-Metasploit_Meterpreter.md",
-                "mode": "source",
-                "source": false
+                "file": "assets/img/favicons/web-app-manifest-512x512.png"
               },
-              "icon": "lucide-file",
-              "title": "2026-07-28-Metasploit_Meterpreter"
+              "icon": "lucide-image",
+              "title": "web-app-manifest-512x512"
             }
           }
         ]
@@ -171,10 +169,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "_posts/2026-07-28-Metasploit_Meterpreter.md"
+                "file": "assets/img/qq.png"
               },
               "icon": "lucide-info",
-              "title": "Свойства файла для 2026-07-28-Metasploit_Meterpreter"
+              "title": "Свойства файла для qq"
             }
           }
         ],
@@ -198,11 +196,17 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "1aeabc13281ff3c4",
+  "active": "c772f25e76a9a2b4",
   "lastOpenFiles": [
+    "assets/img/qq.png",
+    "_tabs/tags.md",
+    "assets/img/web-app-manifest-512x512.png",
+    "_tabs/categories.md",
+    "_tabs/archives.md",
+    "_tabs/about.md",
+    "_posts/2026-07-28-Metasploit_Meterpreter.md",
     "assets/img/favicons/apple-touch-icon.png",
     "README.md",
-    "_posts/2026-07-28-Metasploit_Meterpreter.md",
     "assets/img/posts/28-07-2026-16-00.png",
     "post-template/templates_post.md",
     "assets/img/favicons/favicon-96x96.png",
@@ -213,14 +217,8 @@
     "assets/img/favicons/site.webmanifest",
     "assets/img/favicons/favicon.ico",
     "assets/img/favicons/mstile-150x150.png",
-    "assets/img/favicons/favicon-16x16.png",
-    "assets/img/favicons/android-chrome-384x384.png",
     "_posts/2026-07-27-Хлеб.md",
     "_posts/2026-07-27-test1.md",
-    "_tabs/tags.md",
-    "_tabs/categories.md",
-    "_tabs/archives.md",
-    "_tabs/about.md",
     "assets/img/posts",
     "post-template/Temp1.md",
     "Без названия.md",
