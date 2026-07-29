@@ -11,12 +11,14 @@
             "id": "1aeabc13281ff3c4",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "assets/img/favicons/web-app-manifest-512x512.png"
+                "file": "_posts/2026-07-28-Meterpreter.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "web-app-manifest-512x512"
+              "icon": "lucide-file",
+              "title": "2026-07-28-Meterpreter"
             }
           }
         ]
@@ -196,22 +198,22 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "c772f25e76a9a2b4",
+  "active": "1aeabc13281ff3c4",
   "lastOpenFiles": [
+    "assets/img/favicons/web-app-manifest-512x512.png",
     "assets/img/qq.png",
     "_tabs/tags.md",
     "assets/img/web-app-manifest-512x512.png",
     "_tabs/categories.md",
     "_tabs/archives.md",
     "_tabs/about.md",
-    "_posts/2026-07-28-Metasploit_Meterpreter.md",
+    "_posts/2026-07-28-Meterpreter.md",
     "assets/img/favicons/apple-touch-icon.png",
     "README.md",
     "assets/img/posts/28-07-2026-16-00.png",
     "post-template/templates_post.md",
     "assets/img/favicons/favicon-96x96.png",
     "assets/img/favicons/favicon.svg",
-    "assets/img/favicons/web-app-manifest-512x512.png",
     "assets/img/favicons/web-app-manifest-192x192.png",
     "assets/img/favicons/favicon-32x32.png",
     "assets/img/favicons/site.webmanifest",
