@@ -4,5 +4,6 @@
   "templater-obsidian",
   "nldates-revived",
   "obsidian-git",
-  "highlightr-plugin"
+  "highlightr-plugin",
+  "obsidian-languagetool-plugin"
 ]
