@@ -13,15 +13,28 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2026-07-29-Blue.md",
+                "file": "_posts/2026-07-30-Hacker Holidays 3.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-07-29-Blue"
+              "title": "2026-07-30-Hacker Holidays 3"
+            }
+          },
+          {
+            "id": "1fcbd02b91b95bad",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/Drawing 2026-07-30 12.30.17.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Drawing 2026-07-30 12.30.17.excalidraw"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -176,14 +189,23 @@
               "icon": "lucide-info",
               "title": "Свойства файла для qq"
             }
+          },
+          {
+            "id": "8cacb304b1c0e334",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
         ],
-        "currentTab": 5
+        "currentTab": 6
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -195,13 +217,24 @@
       "command-palette:Открыть палитру команд": false,
       "bases:Создать новую базу": false,
       "templater-obsidian:Templater": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "obsidian-excalidraw-plugin:Создать новый чертеж": false
     }
   },
-  "active": "1aeabc13281ff3c4",
+  "active": "1fcbd02b91b95bad",
   "lastOpenFiles": [
-    "_posts/2026-07-28-Meterpreter.md",
+    "_posts/2026-07-30-Hacker Holidays 3.md",
+    "Excalidraw/Drawing 2026-07-30 12.30.17.excalidraw.md",
+    "Excalidraw",
+    "Без названия 2.base",
+    "Без названия 1.base",
+    "Без названия.base",
+    "assets/img/posts/5121.png",
+    "assets/img/posts/30-07-2026-11-41.png",
+    "assets/img/posts/30-07-2026-11-40.png",
+    "post-template/templates_post.md",
     "_posts/2026-07-29-Blue.md",
+    "_posts/2026-07-28-Meterpreter.md",
     "assets/img/favicons/web-app-manifest-512x512.png",
     "assets/img/qq.png",
     "_tabs/tags.md",
@@ -212,14 +245,10 @@
     "assets/img/favicons/apple-touch-icon.png",
     "README.md",
     "assets/img/posts/28-07-2026-16-00.png",
-    "post-template/templates_post.md",
     "assets/img/favicons/favicon-96x96.png",
     "assets/img/favicons/favicon.svg",
-    "assets/img/favicons/web-app-manifest-192x192.png",
-    "assets/img/favicons/favicon-32x32.png",
     "assets/img/favicons/site.webmanifest",
     "assets/img/favicons/favicon.ico",
-    "assets/img/favicons/mstile-150x150.png",
     "_posts/2026-07-27-Хлеб.md",
     "_posts/2026-07-27-test1.md",
     "assets/img/posts",
@@ -229,8 +258,6 @@
     "post-template/post1.md",
     "post-template",
     "_posts/123.txt",
-    "_posts/Новый текстовый документ.txt",
-    "_posts",
-    "Новая папка"
+    "_posts/Новый текстовый документ.txt"
   ]
 }

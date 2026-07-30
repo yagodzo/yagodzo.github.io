@@ -1,5 +1,5 @@
 ---
-title: Meterpreter_Tryhackme
+title: Meterpreter
 date: 2026-07-28 14:48 +0300
 categories:
   - TryHackMe
