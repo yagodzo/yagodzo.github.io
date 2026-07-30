@@ -25,6 +25,18 @@
             "id": "1fcbd02b91b95bad",
             "type": "leaf",
             "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/Drawing 2026-07-30 12.30.17.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Drawing 2026-07-30 12.30.17.excalidraw"
+            }
+          },
+          {
+            "id": "b078804fba1cd200",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "_posts/2026-07-30-Hacker Holidays 3.md",
@@ -36,7 +48,7 @@
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -224,11 +236,16 @@
       "obsidian-excalidraw-plugin:Создать новый чертеж": false
     }
   },
-  "active": "1fcbd02b91b95bad",
+  "active": "b078804fba1cd200",
   "lastOpenFiles": [
-    "Excalidraw/Drawing 2026-07-30 12.30.39.excalidraw.md",
+    "assets/img/posts/Drawing 2026-07-30 12.40.48.excalidraw.png",
+    "Excalidraw/Drawing 2026-07-30 12.40.48.excalidraw.md",
+    "assets/img/posts/Pasted Image 20260730124058_486.png",
     "Excalidraw/Drawing 2026-07-30 12.30.17.excalidraw.md",
+    "Excalidraw/Без названия.md",
     "_posts/2026-07-30-Hacker Holidays 3.md",
+    "assets/img/posts/Drawing 2026-07-30 12.30.17.excalidraw.png",
+    "Excalidraw/Drawing 2026-07-30 12.30.39.excalidraw.md",
     "assets/img/posts/Pasted Image 20260730123058_041.png",
     "Excalidraw",
     "Без названия 2.base",
@@ -249,8 +266,6 @@
     "_tabs/about.md",
     "assets/img/favicons/apple-touch-icon.png",
     "README.md",
-    "assets/img/posts/28-07-2026-16-00.png",
-    "assets/img/favicons/favicon-96x96.png",
     "assets/img/favicons/site.webmanifest",
     "assets/img/favicons/favicon.ico",
     "_posts/2026-07-27-Хлеб.md",

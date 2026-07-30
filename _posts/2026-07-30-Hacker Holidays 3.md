@@ -33,3 +33,5 @@ AWS.config.credentials.get(function() {
 });
 ```
 ![](assets/img/posts/5121.png)
+![](assets/img/posts/Drawing%202026-07-30%2012.30.17.excalidraw.png)
+![](assets/img/posts/Drawing%202026-07-30%2012.40.48.excalidraw.png)
