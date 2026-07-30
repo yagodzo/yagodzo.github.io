@@ -2,5 +2,6 @@
   "useMarkdownLinks": true,
   "newLinkFormat": "absolute",
   "attachmentFolderPath": "assets/img/posts/",
-  "promptDelete": false
+  "promptDelete": false,
+  "showUnsupportedFiles": true
 }
