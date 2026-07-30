@@ -5,8 +5,10 @@ categories:
   - TryHackMe
 tags:
   - ctf
+aliases:
+  - assets/img/posts/30-07-2026-11-40.png
 ---
-Нам предоставили доступ к веб-приложению по адресу `http://complimentary-wellness-app-332173347248.s3-website-us-east-1.amazonaws.com/`. Интерфейс минималистичен: нет форм логина.
+Нам предоставили доступ к веб-приложению по адресу `http://complimentary-wellness-app-332173347248.s3-website-us-east-1.amazonaws.com/`. 
 ![](assets/img/posts/30-07-2026-11-40.png)
 Первым делом открываем DevTools и изучаем исходный код. 
 ![](assets/img/posts/30-07-2026-11-41.png)В файле `app.js` замечаем следующую логику:
