@@ -7,6 +7,7 @@ tags:
   - ctf
 aliases:
   - assets/img/posts/30-07-2026-11-40.png
+excalidraw-plugin: parsed
 ---
 Нам предоставили доступ к веб-приложению по адресу `http://complimentary-wellness-app-332173347248.s3-website-us-east-1.amazonaws.com/`. 
 ![](assets/img/posts/30-07-2026-11-40.png)
@@ -36,4 +37,4 @@ AWS.config.credentials.get(function() {
 ```
 ![](assets/img/posts/5121.png)
 ![](assets/img/posts/Drawing%202026-07-30%2012.30.17.excalidraw.png)
-![](assets/img/posts/Drawing%202026-07-30%2012.40.48.excalidraw.png)
+![697](assets/img/posts/Drawing%202026-07-30%2012.40.48.excalidraw.png)
