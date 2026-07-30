@@ -13,12 +13,7 @@
   "shell_path": "",
   "user_scripts_folder": "",
   "enable_folder_templates": true,
-  "folder_templates": [
-    {
-      "folder": "_posts",
-      "template": "post-template/templates_post.md"
-    }
-  ],
+  "folder_templates": [],
   "enable_file_templates": false,
   "file_templates": [
     {
@@ -31,13 +26,11 @@
   "enabled_templates_hotkeys": [
     ""
   ],
-  "startup_templates": [
-    ""
-  ],
+  "startup_templates": [],
   "intellisense_render": 1,
   "ignore_folders_on_creation": [
     {
-      "folder": ""
+      "folder": "_posts"
     }
   ]
 }
