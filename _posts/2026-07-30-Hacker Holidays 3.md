@@ -1,14 +1,13 @@
 ---
 title: 2026-07-30-Hacker Holidays 3
-date: 2026-07-31 10:50 +0300
+date: 2026-07-31 10:58 +0300
 categories:
   - TryHackMe
 tags:
   - ctf
-media_subpath: /assets/images/2026-07-30-Hacker Holidays 3/
+media_subpath: /assets/images/Hacker Holidays 3/
 image:
   path: cover.webp
-  alt: 2026-07-30-Hacker Holidays 3
 ---
 Нам предоставили доступ к веб-приложению по адресу `http://complimentary-wellness-app-332173347248.s3-website-us-east-1.amazonaws.com/`. 
 ![](assets/img/posts/30-07-2026-11-40.png)

@@ -6,5 +6,4 @@ tags: []
 media_subpath: /assets/images/{{title}}/
 image:
   path: cover.webp
-  alt: "{{title}}"
 ---
