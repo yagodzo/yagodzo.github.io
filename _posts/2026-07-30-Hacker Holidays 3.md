@@ -1,10 +1,14 @@
 ---
-title: Hacker Holidays 3 - AWS Cognito & DynamoDB Enumeration
-date: 2026-07-30 11:27 +0300
+title: 2026-07-30-Hacker Holidays 3
+date: 2026-07-31 10:50 +0300
 categories:
   - TryHackMe
 tags:
   - ctf
+media_subpath: /assets/images/2026-07-30-Hacker Holidays 3/
+image:
+  path: cover.webp
+  alt: 2026-07-30-Hacker Holidays 3
 ---
 Нам предоставили доступ к веб-приложению по адресу `http://complimentary-wellness-app-332173347248.s3-website-us-east-1.amazonaws.com/`. 
 ![](assets/img/posts/30-07-2026-11-40.png)
@@ -19,19 +23,15 @@ AWS.config.credentials = new AWS.CognitoIdentityCredentials({
   IdentityPoolId: IDENTITY_POOL_ID,
 });
 ```
-Приложение использует Amazon Cognito Identity Pool для автоматической выдачи временных AWS-ключей неаутентифицированным пользователям. Фронтенд использует метод `getItem`, чтобы прочитать из DynamoDB только свою запись по сгенерированному `guest_id`.
+**Гипотеза**: IAM-роль для неаутентифицированных пользователей имеет избыточные права, позволяющие выполнить `dynamodb:Scan` вместо ограниченного `GetItem`. Разработчик ошибочно доверился клиентскому коду, полагая, что пользователь не выйдет за рамки запроса, заложенного в JavaScript.
 
-Возникает вопрос: что если IAM-роль, привязанная к этому пулу, настроена с избыточными привилегиями? Если мы получим эти временные ключи, сможем ли мы выйти за рамки бизнес-логики фронтенда и прочитать данные других гостей?
+Проверяем это, извлекая временные ключи и обращаясь к AWS напрямую.
 
-```
-AWS.config.credentials.get(function() {
-  console.log({
-    accessKeyId: AWS.config.credentials.accessKeyId,
-    secretAccessKey: AWS.config.credentials.secretAccessKey,
-    sessionToken: AWS.config.credentials.sessionToken
-  });
-});
-```
+1. Извлекаем ключи через консоль браузера:
 ![](assets/img/posts/5121.png)
+2. Экспортируем полученные значения в переменные окружения для работы AWS CLI + Обходим бизнес-логику фронтенда и выгружаем всю таблицу:
 ![](assets/img/posts/Drawing%202026-07-30%2012.30.17.excalidraw.png)
+3. В дампе чужой записи (в поле `notes`) обнаруживается искомый флаг. Для его быстрого извлечения из JSON-вывода можно использовать:
 ![697](assets/img/posts/Drawing%202026-07-30%2012.40.48.excalidraw.png)
+
+**Root cause**: Безопасность не должна строиться на ограничениях в браузере. Выдача клиенту прямых AWS-ключей без строгих IAM-условий (или использование прослойки API Gateway + Lambda) неизбежно ведет к компрометации данных.
