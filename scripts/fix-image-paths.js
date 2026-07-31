@@ -2,34 +2,47 @@
 /**
  * fix-image-paths.js
  *
- * Проходит по всем файлам в _posts/*.md и исправляет ссылки на изображения
- * в теле поста: если ссылка относительная (не http/https и не абсолютная
- * от корня сайта) и содержит путь к папке, оставляет только имя файла.
+ * Для каждого поста в _posts/*.md:
+ *   1. Находит его папку с изображениями по полю media_subpath из frontmatter.
+ *   2. Конвертирует все png/jpg/jpeg в этой папке в webp (кроме cover.webp,
+ *      который уже webp) и удаляет оригиналы.
+ *   3. В тексте поста обновляет ссылки на изображения:
+ *      - меняет расширение на .webp, если файл был сконвертирован
+ *      - обрезает путь к папке, оставляя только имя файла
+ *      - внешние (http/https) и уже "чистые" ссылки не трогает
  *
- * Пример:
- *   ![](./images/Box/31-07-2026-12-14.png)  ->  ![](31-07-2026-12-14.png)
- *   ![alt](images/Box/screen.png "title")   ->  ![alt](screen.png "title")
- *
- * Frontmatter (title, image.path и т.д.) не трогает — работает только
- * с markdown-ссылками ![...](...) в теле поста, начиная после закрывающего
- * "---" frontmatter.
+ * Требуется пакет sharp:
+ *   npm install sharp
  *
  * Запуск вручную:
  *   node scripts/fix-image-paths.js
  *
- * Запуск с флагом --check — ничего не меняет, только показывает,
- * какие файлы содержат "плохие" ссылки (удобно для CI):
+ * Только проверка, без изменений (для CI):
  *   node scripts/fix-image-paths.js --check
  */
 
 const fs = require("fs");
 const path = require("path");
+let sharp;
+try {
+  sharp = require("sharp");
+} catch (e) {
+  console.error("Не найден пакет sharp. Установите его командой: npm install sharp");
+  process.exit(1);
+}
 
-const POSTS_DIR = path.join(process.cwd(), "_posts");
+const ROOT = process.cwd();
+const POSTS_DIR = path.join(ROOT, "_posts");
 const CHECK_ONLY = process.argv.includes("--check");
 
-// Ссылка вида ![alt](путь "необязательный title")
 const IMAGE_LINK_RE = /!\[([^\]]*)\]\(([^)\s]+)(\s+"[^"]*")?\)/g;
+const CONVERTIBLE_EXT = new Set([".png", ".jpg", ".jpeg"]);
+
+// Chirpy рекомендует обложку 1200x630 (пропорция 1.91:1) — при другом размере
+// тема сама обрезает картинку, и получается тот самый "кривой" кроп.
+// Приводим обложку к этому размеру заранее, с обрезкой по центру (без искажений).
+const COVER_WIDTH = 1200;
+const COVER_HEIGHT = 630;
 
 function isExternalOrAbsolute(link) {
   return (
@@ -46,69 +59,112 @@ function toBasename(link) {
 }
 
 function splitFrontmatter(content) {
-  // Frontmatter — это блок между первой и второй строкой "---"
   const match = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
-  if (!match) {
-    return { frontmatter: "", body: content };
-  }
-  const frontmatter = match[0];
-  const body = content.slice(frontmatter.length);
-  return { frontmatter, body };
+  if (!match) return { frontmatter: "", body: content };
+  return { frontmatter: match[0], body: content.slice(match[0].length) };
 }
 
-function fixBody(body) {
+function getMediaSubpath(frontmatter) {
+  const m = frontmatter.match(/^media_subpath:\s*(.+)\s*$/m);
+  if (!m) return null;
+  return m[1].trim().replace(/^\/|\/$/g, ""); // без ведущего/конечного слэша
+}
+
+async function convertFolderToWebp(folderPath, log) {
+  if (!fs.existsSync(folderPath)) return {};
+  const renameMap = {}; // "старое-имя.png" -> "старое-имя.webp"
+  const files = fs.readdirSync(folderPath);
+
+  for (const file of files) {
+    const ext = path.extname(file).toLowerCase();
+    if (!CONVERTIBLE_EXT.has(ext)) continue;
+
+    const fullPath = path.join(folderPath, file);
+    const base = path.basename(file, ext);
+    const webpName = `${base}.webp`;
+    const webpPath = path.join(folderPath, webpName);
+
+    if (CHECK_ONLY) {
+      renameMap[file] = webpName;
+      log.push(`[нужно конвертировать] ${file} -> ${webpName}`);
+      continue;
+    }
+
+    await sharp(fullPath).webp({ quality: 82 }).toFile(webpPath);
+    fs.unlinkSync(fullPath);
+    renameMap[file] = webpName;
+    log.push(`[конвертировано] ${file} -> ${webpName}`);
+  }
+
+  return renameMap;
+}
+
+function fixBody(body, renameMap) {
   let changed = false;
   const fixed = body.replace(IMAGE_LINK_RE, (full, alt, link, title = "") => {
-    if (isExternalOrAbsolute(link)) {
-      return full; // внешние и абсолютные ссылки не трогаем
+    if (isExternalOrAbsolute(link)) return full;
+
+    let base = toBasename(link);
+    if (renameMap[base]) {
+      base = renameMap[base];
     }
-    const base = toBasename(link);
-    if (base === link) {
-      return full; // уже голое имя файла, менять нечего
-    }
+
+    if (base === link) return full;
     changed = true;
     return `![${alt}](${base}${title})`;
   });
   return { fixed, changed };
 }
 
-function main() {
+async function main() {
   if (!fs.existsSync(POSTS_DIR)) {
     console.error(`Папка не найдена: ${POSTS_DIR}`);
     console.error("Запускайте скрипт из корня репозитория блога.");
     process.exit(1);
   }
 
-  const files = fs
-    .readdirSync(POSTS_DIR)
-    .filter((f) => f.endsWith(".md"));
-
-  let anyChanged = false;
+  const files = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md"));
   let anyBad = false;
+  let anyChanged = false;
 
   for (const file of files) {
     const filePath = path.join(POSTS_DIR, file);
     const content = fs.readFileSync(filePath, "utf8");
     const { frontmatter, body } = splitFrontmatter(content);
-    const { fixed, changed } = fixBody(body);
 
-    if (changed) {
+    const log = [];
+    let renameMap = {};
+
+    const mediaSubpath = getMediaSubpath(frontmatter);
+    if (mediaSubpath) {
+      const folderPath = path.join(ROOT, mediaSubpath);
+      renameMap = await convertFolderToWebp(folderPath, log);
+    }
+
+    const { fixed, changed } = fixBody(body, renameMap);
+    const anythingHappened = changed || log.length > 0;
+
+    if (anythingHappened) {
       anyBad = true;
-      if (CHECK_ONLY) {
-        console.log(`[нужно исправить] ${file}`);
-      } else {
+      if (log.length) {
+        console.log(`${file}:`);
+        log.forEach((l) => console.log("  " + l));
+      }
+      if (changed) {
+        console.log(`  [ссылки обновлены] ${file}`);
+      }
+      if (!CHECK_ONLY) {
         fs.writeFileSync(filePath, frontmatter + fixed, "utf8");
-        console.log(`[исправлено] ${file}`);
         anyChanged = true;
       }
     }
   }
 
   if (!anyBad) {
-    console.log("Все ссылки на изображения уже в порядке.");
+    console.log("Все изображения и ссылки уже в порядке.");
   } else if (CHECK_ONLY) {
-    console.log("\nНайдены посты с некорректными путями к изображениям.");
-    process.exit(1); // ненулевой код — удобно для CI, чтобы упасть сборку
+    console.log("\nНайдены посты, требующие конвертации/исправления путей.");
+    process.exit(1);
   } else if (anyChanged) {
     console.log("\nГотово. Не забудьте git add изменённые файлы.");
   }
