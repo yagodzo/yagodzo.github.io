@@ -1,7 +1,10 @@
 {
   "useMarkdownLinks": true,
-  "newLinkFormat": "absolute",
-  "attachmentFolderPath": "assets/img/posts/",
+  "newLinkFormat": "relative",
+  "attachmentFolderPath": "images/Box",
   "promptDelete": false,
-  "showUnsupportedFiles": true
+  "showUnsupportedFiles": true,
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "images"
 }
