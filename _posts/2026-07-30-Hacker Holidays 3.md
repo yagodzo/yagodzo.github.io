@@ -5,7 +5,7 @@ categories:
   - TryHackMe
 tags:
   - ctf
-media_subpath: /assets/images/Hacker Holidays 3/
+media_subpath: /images/Hacker Holidays 3/
 image:
   path: cover.webp
 ---
@@ -31,6 +31,6 @@ AWS.config.credentials = new AWS.CognitoIdentityCredentials({
 2. Экспортируем полученные значения в переменные окружения для работы AWS CLI + Обходим бизнес-логику фронтенда и выгружаем всю таблицу:
 ![](Drawing%202026-07-30%2012.30.17.excalidraw.png)
 3. В дампе чужой записи (в поле `notes`) обнаруживается искомый флаг. Для его быстрого извлечения из JSON-вывода можно использовать:
-![697](Drawing%202026-07-30%2012.40.48.excalidraw.png)
+![392](Drawing%202026-07-30%2012.40.48.excalidraw.png)
 
 **Root cause**: Безопасность не должна строиться на ограничениях в браузере. Выдача клиенту прямых AWS-ключей без строгих IAM-условий (или использование прослойки API Gateway + Lambda) неизбежно ведет к компрометации данных.
