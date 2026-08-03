@@ -1,5 +1,5 @@
 ---
-title: 2026-07-30-Hacker Holidays 3
+title: Hacker Holidays 3
 date: 2026-07-31 10:58 +0300
 categories:
   - TryHackMe
