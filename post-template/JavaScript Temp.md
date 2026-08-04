@@ -39,7 +39,6 @@ tags: []
 media_subpath: /${imageFolder}/
 image:
   path: cover.webp
-  alt: "${postTitle}"
 ---
 `;
 tR += frontMatter;
