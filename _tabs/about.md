@@ -3,4 +3,7 @@
 icon: fas fa-info-circle
 order: 4
 ---
-### Hey, I'm yagodzo.
+### Hey, I'm yagodzo. 
+
+nmap -sC -sV -oN /path
+
