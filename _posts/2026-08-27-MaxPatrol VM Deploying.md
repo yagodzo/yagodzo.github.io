@@ -5,9 +5,8 @@ categories:
   - General
 tags:
   - Обучение
-media_subpath: /images/MaxPatrol VM Deploying/
 image:
-  path: cover.webp
+  path: /images/MaxPatrol%20VM%20Deploying/cover.webp
 ---
 # MaxPatrol VM
 
@@ -21,8 +20,8 @@ MaxPatrol VM — флагманский сканер уязвимостей на
 - **Knowledge Base** — единая база знаний (сигнатуры уязвимостей, бюллетени, рекомендации) для всех продуктов PT.
 - **PT MC** — сервис администрирования. SSO, управление доступом (RBAC), аудит действий.
 - **PT UCS** — сервис обновлений. Доставка новых версий и баз уязвимостей через SaltStack.
-![](../images/Обучение.%20Заметки/22-09-2026-12-49.png)
-![](../images/Обучение.%20Заметки/22-09-2026-16-44.png)
+![](/images/MaxPatrol%20VM%20Deploying/22-09-2026-12-49.png)
+![](/images/MaxPatrol%20VM%20Deploying/22-09-2026-16-44.png)
 ## Лицензирование
 
 - **Базовая:** ограничивает максимальное количество узлов (любые устройства с IP-адресом, включая ВМ любой вложенности).

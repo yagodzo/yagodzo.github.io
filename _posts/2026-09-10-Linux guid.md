@@ -5,9 +5,8 @@ categories:
   - TryHackMe
 tags:
   - Обучение
-media_subpath: /images/Linux guid/
 image:
-  path: cover.webp
+  path: /images/Linux%20guid/cover.webp
 ---
 Find files based on filename 
 `find /home/Andy -type f -name sales.txt` 

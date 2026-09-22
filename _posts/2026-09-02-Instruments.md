@@ -5,8 +5,7 @@ categories:
   - TryHackMe
 tags:
   - Обучение
-media_subpath: /images/Instruments/
 image:
-  path: cover.webp
+  path: /images/Instruments/cover.webp
 ---
 FlareVM  [github.com/mandiant/flare-vm](https://github.com/mandiant/flare-vm)
