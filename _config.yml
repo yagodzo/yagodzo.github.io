@@ -3,7 +3,7 @@
 # Import the theme
 theme: jekyll-theme-chirpy
 
-lang: en
+lang: ru-RU
 timezone: Europe/Moscow
 
 # ↓ jekyll-seo-tag settings
@@ -158,6 +158,10 @@ exclude:
   - purgecss.js
   - "*.config.js"
   - "package*.json"
+  # --- Рабочие файлы Obsidian: в репозитории нужны, на сайте — нет ---
+  - Excalidraw # исходники схем (.excalidraw.md с front matter — иначе станут страницами)
+  - post-template # шаблоны Templater (до этого публиковались как /post-template/Main Template.html)
+  - scripts # служебные скрипты сборки
 
 jekyll-archives:
   enabled: [categories, tags]
