@@ -31,14 +31,17 @@ if (!await app.vault.adapter.exists(coverPath)) {
 await app.vault.setConfig("attachmentFolderPath", imageFolder);
 
 // 6. Генерируем front matter
+// media_subpath намеренно НЕ указываем: Chirpy приклеивает его в том числе
+// к абсолютным путям, и тогда ссылки вида /images/... ломаются.
+// Все пути к картинкам — абсолютные; scripts/fix-image-paths.js
+// нормализует их перед коммитом.
 const frontMatter = `---
 title: "${postTitle}"
 date: ${tp.date.now("YYYY-MM-DD HH:mm")} +0300
 categories: [TryHackMe]
 tags: []
-media_subpath: /${imageFolder}/
 image:
-  path: cover.webp
+  path: /${imageFolder}/cover.webp
 ---
 `;
 tR += frontMatter;
