@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -20,24 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Полная история обязательна: _plugins/posts-lastmod-hook.rb
-          # определяет дату правки поста через `git rev-list --count HEAD`.
-          # При shallow-клоне счётчик всегда равен 1 и дата не проставляется.
+          # _plugins/posts-lastmod-hook.rb читает дату правки через git log
           fetch-depth: 0
 
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
-          # bundler-cache уже выполняет bundle install, отдельный шаг не нужен
           bundler-cache: true
 
       - run: bundle exec jekyll build --baseurl ""
         env:
           JEKYLL_ENV: production
 
-      # Ловит битые внутренние ссылки и картинки до деплоя.
-      # html-proofer уже был в Gemfile, но никогда не запускался — из-за чего
-      # сломанные пути к изображениям уезжали в прод незамеченными.
       - name: Test site
         run: |
           bundle exec htmlproofer _site \
@@ -51,6 +43,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

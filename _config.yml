@@ -158,10 +158,10 @@ exclude:
   - purgecss.js
   - "*.config.js"
   - "package*.json"
-  # --- Рабочие файлы Obsidian: в репозитории нужны, на сайте — нет ---
-  - Excalidraw # исходники схем (.excalidraw.md с front matter — иначе станут страницами)
-  - post-template # шаблоны Templater (до этого публиковались как /post-template/Main Template.html)
-  - scripts # служебные скрипты сборки
+  # Рабочие файлы Obsidian: хранятся в репозитории, но не публикуются
+  - Excalidraw
+  - post-template
+  - scripts
 
 jekyll-archives:
   enabled: [categories, tags]

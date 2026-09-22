@@ -1,64 +1,32 @@
 #!/usr/bin/env node
 /**
- * fix-image-paths.js
+ * Нормализует ссылки на изображения в _posts/*.md к виду /images/<папка>/<файл>.
  *
- * Приводит все ссылки на изображения в _posts/*.md к одному виду —
- * абсолютному пути от корня сайта: /images/<Папка>/<файл>.
+ * Obsidian записывает путь относительно заметки, а Chirpy разрешает его
+ * относительно media_subpath — из-за расхождения ссылки ломаются. Скрипт
+ * находит файл по имени внутри images/ и подставляет абсолютный путь.
  *
- * ЗАЧЕМ
- * Obsidian вставляет ссылки в своём формате (относительный путь от заметки,
- * иногда wiki-ссылка), а Chirpy приклеивает `media_subpath` к любому пути,
- * который не содержит "://". Из-за этого получался мусор вида
- *   /images/Пост/../images/Другая папка/file.png   -> 404
- * и картинки молча переставали грузиться.
- *
- * ВАЖНО ПРО media_subpath
- * Chirpy приклеивает media_subpath даже к абсолютным путям
- * (см. _includes/media-url.html: `{% unless url contains ':' %}`).
- * Поэтому абсолютные пути и media_subpath несовместимы — скрипт
- * переписывает обложку (image.path) в абсолютный вид и убирает
- * строку media_subpath из frontmatter. Это же делает схему
- * самовосстанавливающейся: если шаблон Templater снова добавит
- * media_subpath, хук уберёт её на ближайшем коммите.
- *
- * ЧТО ДЕЛАЕТ
- *   ![](../images/Заметки/screen.png)  ->  ![](/images/Заметки/screen.png)
- *   ![](screen.png)                    ->  ![](/images/Заметки/screen.png)
- *   ![[screen.png]]                    ->  ![](/images/Заметки/screen.png)
- *   ![[screen.png|392]]                ->  ![392](/images/Заметки/screen.png)
- *   frontmatter: media_subpath + path: cover.webp -> path: /images/Заметки/cover.webp
- *
- * Файл ищется по имени внутри images/, поэтому неважно, в какую подпапку
- * Obsidian его сохранил. Если одноимённых файлов несколько, предпочтение
- * отдаётся папке из media_subpath, затем — пути, уже указанному в ссылке.
- *
- * Внешние ссылки (http/https/data:) и абсолютные пути мимо images/
- * (например /assets/img/...) не трогаются.
- *
- * ЗАПУСК
- *   node scripts/fix-image-paths.js            # починить
- *   node scripts/fix-image-paths.js --check    # только проверить (CI/хук)
- *
- * КОДЫ ВОЗВРАТА
- *   0 — всё хорошо
- *   1 — есть ссылки, которые не удалось разрешить (файл не найден),
- *       либо в режиме --check найдены места, требующие правки.
+ * Использование: node scripts/fix-image-paths.js [--check]
+ * Код возврата 1 — остались нерешённые проблемы; в режиме --check также
+ * когда файлы требуют правки.
  */
 
 const fs = require("fs");
 const path = require("path");
 
-const ROOT = process.cwd();
-const POSTS_DIR = path.join(ROOT, "_posts");
-const IMAGES_DIR = path.join(ROOT, "images");
-const IMAGES_URL_PREFIX = "/images/";
+const POSTS_DIR = path.join(process.cwd(), "_posts");
+const IMAGES_DIR = path.join(process.cwd(), "images");
+const URL_PREFIX = "/images/";
 const CHECK_ONLY = process.argv.includes("--check");
 
-// ![alt](путь "необязательный title")
-const MD_IMAGE_RE = /!\[([^\]]*)\]\(([^)\s]+)(\s+"[^"]*")?\)/g;
-// ![[путь|необязательный alt]] — формат Obsidian
-const WIKI_IMAGE_RE = /!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g;
-const MEDIA_SUBPATH_RE = /^media_subpath:[ \t]*(.+?)[ \t]*\r?\n/m;
+const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
+const MEDIA_SUBPATH = /^media_subpath:[ \t]*(.+?)[ \t]*\r?\n/m;
+const COVER_PATH = /(^image:[ \t]*\r?\n(?:[ \t]+[^\r\n]*\r?\n)*?[ \t]+path:[ \t]*)([^\r\n]+)/m;
+// Скобки внутри пути допустимы, если сбалансированы («Screenshot (1).png»):
+// kramdown такие ссылки разбирает, значит и здесь их нельзя терять.
+const MD_IMAGE = /!\[([^\]]*)\]\(((?:[^()\s]|\([^()\s]*\))+)(\s+"[^"]*")?\)/g;
+const WIKI_IMAGE = /!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g;
+const MD_IMAGE_LOOSE = /!\[[^\]]*\]\(([^)"]*)\)/g;
 
 function walk(dir, acc = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -69,10 +37,11 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-/** basename -> [путь относительно images/, ...] */
+/** Индекс `имя файла -> [путь относительно images/]`. */
 function indexImages() {
   const index = new Map();
   if (!fs.existsSync(IMAGES_DIR)) return index;
+
   for (const full of walk(IMAGES_DIR)) {
     const rel = path.relative(IMAGES_DIR, full).split(path.sep).join("/");
     const base = path.basename(rel);
@@ -82,202 +51,150 @@ function indexImages() {
   return index;
 }
 
-/**
- * Ссылки, которые скрипт не трогает: внешние, data: и абсолютные пути
- * мимо images/ (например /assets/img/...). Абсолютные /images/... наоборот
- * проверяются — так чинятся ссылки на переехавшие файлы.
- */
-function shouldSkip(link) {
-  if (/^(https?:)?\/\//.test(link) || link.startsWith("data:")) return true;
-  return link.startsWith("/") && !link.startsWith(IMAGES_URL_PREFIX);
-}
-
-function decodeLink(link) {
+function decode(link) {
   try {
     return decodeURIComponent(link);
   } catch {
-    return link; // битая процентная последовательность — оставляем как есть
+    return link;
   }
 }
 
-/** Кодируем только то, что ломает markdown-ссылку или URL. */
-function encodePath(relPath) {
+function encode(relPath) {
   return relPath
     .split("/")
-    .map((seg) =>
-      seg.replace(/%/g, "%25").replace(/ /g, "%20").replace(/\?/g, "%3F").replace(/#/g, "%23")
+    .map((segment) =>
+      segment.replace(/[%\s()?#]/g, (char) => "%" + char.charCodeAt(0).toString(16).padStart(2, "0"))
     )
     .join("/");
 }
 
-function splitFrontmatter(content) {
-  const match = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
-  if (!match) return { frontmatter: "", body: content };
-  return { frontmatter: match[0], body: content.slice(match[0].length) };
+/** Внешние ссылки и абсолютные пути вне images/ скрипт не обслуживает. */
+function isManaged(link) {
+  if (/^(https?:)?\/\//.test(link) || link.startsWith("data:")) return false;
+  return !link.startsWith("/") || link.startsWith(URL_PREFIX);
 }
 
-/** Папка поста внутри images/, взятая из media_subpath (для разрешения неоднозначностей). */
-function preferredFolder(frontmatter) {
-  const match = frontmatter.match(MEDIA_SUBPATH_RE);
+function resolveLink(link, index, folder) {
+  const decoded = decode(link);
+  const base = path.basename(decoded.split(/[#?]/)[0]);
+  const candidates = index.get(base) ?? [];
+
+  if (candidates.length === 0) return { error: `файл не найден в images/: ${base}` };
+  if (candidates.length === 1) return { url: URL_PREFIX + encode(candidates[0]) };
+
+  const match =
+    (folder && candidates.find((c) => path.dirname(c) === folder)) ||
+    candidates.find((c) => decoded.endsWith(c));
+
+  // Подставить не тот файл хуже, чем честный 404: на сайте молча окажется
+  // чужая картинка, и заметить это можно только глазами.
+  if (!match) {
+    return {
+      error: `имя "${base}" встречается в ${candidates.length} папках (${candidates.join(", ")}) — укажите папку явно`,
+    };
+  }
+  return { url: URL_PREFIX + encode(match) };
+}
+
+function subpathFolder(frontmatter) {
+  const match = frontmatter.match(MEDIA_SUBPATH);
   if (!match) return null;
+
   const value = match[1].replace(/^["']|["']$/g, "").replace(/^\/+|\/+$/g, "");
-  if (!value.startsWith("images/")) return null;
-  return decodeLink(value.slice("images/".length));
+  return value.startsWith("images/") ? decode(value.slice("images/".length)) : null;
 }
 
 /**
- * Превращает ссылку из поста в абсолютный URL /images/...
- * Возвращает { url } либо { error }.
+ * Chirpy приклеивает media_subpath даже к абсолютным путям, поэтому обложка
+ * переводится в абсолютный вид, а сама директива удаляется.
  */
-function resolveLink(rawLink, index, folder) {
-  const decoded = decodeLink(rawLink);
-  const base = path.basename(decoded.split("#")[0].split("?")[0]);
-  const candidates = index.get(base);
+function rewriteFrontmatter(frontmatter, index, folder, report) {
+  if (!MEDIA_SUBPATH.test(frontmatter)) return frontmatter;
 
-  if (!candidates || candidates.length === 0) {
-    return { error: `файл не найден в images/: ${base}` };
-  }
+  let failed = false;
+  const withCover = frontmatter.replace(COVER_PATH, (full, head, value) => {
+    const raw = value.trim().replace(/^["']|["']$/g, "");
+    if (!isManaged(raw)) return full;
 
-  let chosen = candidates[0];
-  if (candidates.length > 1) {
-    const inFolder = folder && candidates.find((c) => path.dirname(c) === folder);
-    const byPath = candidates.find((c) => decoded.endsWith(c));
-    chosen = inFolder || byPath;
-    // Угадывать нельзя: подставим не тот файл — на сайте молча окажется
-    // чужая картинка, а это хуже, чем честный 404.
-    if (!chosen) {
-      return {
-        error:
-          `имя "${base}" встречается в ${candidates.length} папках ` +
-          `(${candidates.join(", ")}) — укажите папку в ссылке явно`,
-      };
-    }
-  }
-
-  return { url: IMAGES_URL_PREFIX + encodePath(chosen) };
-}
-
-/**
- * Обложку делает абсолютной и убирает media_subpath — иначе Chirpy
- * приклеит subpath к уже абсолютным путям в теле поста.
- */
-function processFrontmatter(frontmatter, index, folder, problems, file) {
-  if (!frontmatter || !MEDIA_SUBPATH_RE.test(frontmatter)) {
-    return { frontmatter, changed: false };
-  }
-
-  let updated = frontmatter;
-  let coverOk = true;
-
-  // path: внутри блока image:
-  updated = updated.replace(
-    /^(image:[ \t]*\r?\n(?:[ \t]+[^\r\n]*\r?\n)*?[ \t]+path:[ \t]*)([^\r\n]+?)([ \t]*\r?\n)/m,
-    (full, head, value, tail) => {
-      const raw = value.replace(/^["']|["']$/g, "");
-      if (shouldSkip(raw)) return full;
-      const resolved = resolveLink(raw, index, folder);
-      if (resolved.error) {
-        problems.push(`${file}: обложка — ${resolved.error}`);
-        coverOk = false;
-        return full;
-      }
-      return head + resolved.url + tail;
-    }
-  );
-
-  if (!coverOk) return { frontmatter, changed: false };
-
-  updated = updated.replace(MEDIA_SUBPATH_RE, "");
-  return { frontmatter: updated, changed: updated !== frontmatter };
-}
-
-/**
- * Ссылка с неэкранированным пробелом внутри скобок не является
- * markdown-ссылкой: её не видит ни kramdown, ни этот скрипт, и на сайте
- * она остаётся текстом. Такое надо показать явно, а не пропустить молча.
- */
-function reportRawSpaces(body, problems, file) {
-  for (const match of body.matchAll(/!\[[^\]]*\]\(([^)"]*)\)/g)) {
-    if (/\s/.test(match[1])) {
-      problems.push(
-        `${file}: пробел в ссылке "${match[1].trim()}" — замените пробелы на %20`
-      );
-    }
-  }
-}
-
-function processBody(body, index, folder, problems, file) {
-  let changed = false;
-
-  reportRawSpaces(body, problems, file);
-
-  const afterWiki = body.replace(WIKI_IMAGE_RE, (full, target, alt) => {
-    const resolved = resolveLink(target, index, folder);
+    const resolved = resolveLink(raw, index, folder);
     if (resolved.error) {
-      problems.push(`${file}: ${resolved.error}`);
+      report(`обложка — ${resolved.error}`);
+      failed = true;
       return full;
     }
-    changed = true;
-    return `![${alt || ""}](${resolved.url})`;
+    return head + resolved.url;
   });
 
-  const afterMd = afterWiki.replace(MD_IMAGE_RE, (full, alt, link, title = "") => {
-    if (shouldSkip(link)) return full;
+  return failed ? frontmatter : withCover.replace(MEDIA_SUBPATH, "");
+}
+
+function rewriteBody(body, index, folder, report) {
+  // Неэкранированный пробел внутри скобок — это не markdown-ссылка: её не
+  // видит ни kramdown, ни регулярные выражения ниже.
+  for (const [, link] of body.matchAll(MD_IMAGE_LOOSE)) {
+    if (/\s/.test(link)) report(`пробел в ссылке "${link.trim()}" — замените на %20`);
+  }
+
+  const replaceLink = (fallback, link, build) => {
+    if (!isManaged(link)) return fallback;
+
     const resolved = resolveLink(link, index, folder);
     if (resolved.error) {
-      problems.push(`${file}: ${resolved.error}`);
-      return full;
+      report(resolved.error);
+      return fallback;
     }
-    if (resolved.url === link) return full; // уже правильная
-    changed = true;
-    return `![${alt}](${resolved.url}${title})`;
-  });
+    return build(resolved.url);
+  };
 
-  return { body: afterMd, changed };
+  return body
+    .replace(WIKI_IMAGE, (full, target, alt) =>
+      replaceLink(full, target, (url) => `![${alt ?? ""}](${url})`)
+    )
+    .replace(MD_IMAGE, (full, alt, link, title = "") =>
+      replaceLink(full, link, (url) => (url === link ? full : `![${alt}](${url}${title})`))
+    );
 }
 
 function main() {
   if (!fs.existsSync(POSTS_DIR)) {
-    console.error(`Папка не найдена: ${POSTS_DIR}`);
-    console.error("Запускайте скрипт из корня репозитория блога.");
+    console.error(`Папка не найдена: ${POSTS_DIR}. Запускайте скрипт из корня репозитория.`);
     process.exit(1);
   }
 
   const index = indexImages();
-  const problems = [];
   const touched = [];
+  let problems = 0;
 
-  for (const name of fs.readdirSync(POSTS_DIR)) {
-    if (!name.endsWith(".md")) continue;
+  for (const name of fs.readdirSync(POSTS_DIR).filter((n) => n.endsWith(".md"))) {
     const file = path.join(POSTS_DIR, name);
     const content = fs.readFileSync(file, "utf8");
-    const { frontmatter, body } = splitFrontmatter(content);
-    const folder = preferredFolder(frontmatter);
+    const match = content.match(FRONTMATTER);
+    const frontmatter = match ? match[0] : "";
+    const body = match ? content.slice(frontmatter.length) : content;
+    const report = (message) => {
+      problems++;
+      console.error(`  ! ${name}: ${message}`);
+    };
 
-    const fm = processFrontmatter(frontmatter, index, folder, problems, name);
-    const md = processBody(body, index, folder, problems, name);
-    if (!fm.changed && !md.changed) continue;
+    const folder = subpathFolder(frontmatter);
+    const updated =
+      rewriteFrontmatter(frontmatter, index, folder, report) +
+      rewriteBody(body, index, folder, report);
 
+    if (updated === content) continue;
     touched.push(name);
-    if (!CHECK_ONLY) fs.writeFileSync(file, fm.frontmatter + md.body, "utf8");
-  }
-
-  for (const problem of problems) console.error(`  ! ${problem}`);
-
-  if (CHECK_ONLY) {
-    if (touched.length) {
-      console.error("Пути к изображениям требуют правки в:");
-      for (const name of touched) console.error(`  - ${name}`);
-      console.error("Запустите: node scripts/fix-image-paths.js");
-    }
-    process.exit(touched.length || problems.length ? 1 : 0);
+    if (!CHECK_ONLY) fs.writeFileSync(file, updated, "utf8");
   }
 
   if (touched.length) {
-    console.log("Пути к изображениям исправлены в:");
-    for (const name of touched) console.log(`  - ${name}`);
+    const header = CHECK_ONLY ? "Требуют правки" : "Исправлено";
+    const log = CHECK_ONLY ? console.error : console.log;
+    log(`${header}:`);
+    for (const name of touched) log(`  - ${name}`);
+    if (CHECK_ONLY) console.error("Запустите: node scripts/fix-image-paths.js");
   }
-  process.exit(problems.length ? 1 : 0);
+
+  process.exit(problems || (CHECK_ONLY && touched.length) ? 1 : 0);
 }
 
 main();
